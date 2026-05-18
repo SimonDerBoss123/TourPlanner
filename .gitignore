@@ -1,0 +1,10 @@
+# Backend
+tourplanner-backend/target/
+tourplanner-backend/.idea/
+
+# Frontend
+tourplanner-frontend/node_modules/
+tourplanner-frontend/build/
+
+# System
+.DS_Store
