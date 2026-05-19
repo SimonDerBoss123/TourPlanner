@@ -1,4 +1,4 @@
-package com.example.tourplannerbackend;
+package com.example.tourplannerbackend.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
