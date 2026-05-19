@@ -1,6 +1,7 @@
 package com.example.tourplannerbackend.controller;
 
 import com.example.tourplannerbackend.domain.Tour;
+import com.example.tourplannerbackend.security.JwtUtil;
 import com.example.tourplannerbackend.service.TourService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.List;
 public class TourController {
 
     private final TourService tourService;
+    private final JwtUtil jwtUtil;
 
-    public TourController(TourService tourService) {
+    public TourController(TourService tourService, JwtUtil jwtUtil) {
         this.tourService = tourService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
@@ -22,8 +25,11 @@ public class TourController {
     }
 
     @PostMapping
-    public Tour createTour(@RequestBody Tour tour) {
-        return tourService.createTour(tour);
+    public Tour createTour(@RequestBody Tour tour, @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+        return tourService.createTour(tour,username);
     }
 
     @DeleteMapping("/{id}")
