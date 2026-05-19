@@ -1,6 +1,5 @@
 package com.example.tourplannerbackend.repository;
 
-import com.example.tourplannerbackend.domain.Tour;
 import com.example.tourplannerbackend.domain.TourLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 

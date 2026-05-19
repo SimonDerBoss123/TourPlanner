@@ -20,4 +20,6 @@ public class Tour {
     @JsonIgnore
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TourLog> tourLogs;
+    @ManyToOne
+    private User user;
 }
