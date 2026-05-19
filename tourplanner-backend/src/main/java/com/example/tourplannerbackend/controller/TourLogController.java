@@ -26,4 +26,20 @@ public class TourLogController {
     public TourLog createTourLog(@RequestBody TourLog tourLog){
         return tourLogService.createTourLog(tourLog);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteTourLog(@PathVariable Long id){
+        tourLogService.deleteTourLog(id);
+    }
+
+    @PutMapping("/{id}")
+    public TourLog updateTourLog(@PathVariable Long id, @RequestBody TourLog tourLog){
+        return tourLogService.updateTourLog(id,tourLog);
+    }
+
+    @GetMapping("/{id}")
+    public TourLog getTourLogById(@PathVariable Long id){
+        return tourLogService.getTourLogById(id);
+    }
+
 }

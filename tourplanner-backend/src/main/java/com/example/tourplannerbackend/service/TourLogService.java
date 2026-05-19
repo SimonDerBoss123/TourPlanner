@@ -22,6 +22,18 @@ public class TourLogService {
         return tourLogRepository.save(tourLog);
     }
 
+    public void deleteTourLog(Long id){
+        tourLogRepository.deleteById(id);
+    }
+
+    public TourLog updateTourLog(Long id, TourLog tourLog){
+        tourLog.setId(id);
+        return tourLogRepository.save(tourLog);
+    }
+
+    public TourLog getTourLogById(Long id){
+        return tourLogRepository.findById(id).orElseThrow();
+    }
 
 
 

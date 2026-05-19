@@ -25,4 +25,19 @@ public class TourController {
     public Tour createTour(@RequestBody Tour tour) {
         return tourService.createTour(tour);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteTour(@PathVariable Long id){
+        tourService.deleteTour(id);
+    }
+
+    @PutMapping("/{id}")
+    public Tour updateTour(@PathVariable Long id, @RequestBody Tour tour){
+        return tourService.updateTour(id,tour);
+    }
+
+    @GetMapping("/{id}")
+    public Tour getTourById(@PathVariable Long id){
+        return tourService.getTourById(id);
+    }
 }

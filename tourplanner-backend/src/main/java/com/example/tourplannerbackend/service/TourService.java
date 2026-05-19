@@ -21,4 +21,18 @@ public class TourService {
     public Tour createTour(Tour tour) {
         return tourRepository.save(tour);
     }
+
+    public void deleteTour(Long id){
+        tourRepository.deleteById(id);
+    }
+
+    public Tour updateTour(Long id, Tour tour){
+       tour.setId(id);
+       return tourRepository.save(tour);
+    }
+
+    public Tour getTourById(Long id){
+        return tourRepository.findById(id).orElseThrow();
+    }
+
 }
