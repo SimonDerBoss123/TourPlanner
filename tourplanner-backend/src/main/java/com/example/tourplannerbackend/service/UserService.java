@@ -7,6 +7,8 @@ import com.example.tourplannerbackend.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -14,6 +16,8 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
 
     public UserService(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
@@ -36,6 +40,7 @@ public class UserService {
         response.setId(savedUser.getId());
         response.setUsername(savedUser.getUsername());
         response.setToken(token);
+        logger.info("User registered: {}", username);
         return response;
     }
 
@@ -53,6 +58,7 @@ public class UserService {
         userResponse.setId(user.getId());
         userResponse.setUsername(user.getUsername());
         userResponse.setToken(token);
+        logger.info("User logged in: {}", username);
         return userResponse;
     }
 }
