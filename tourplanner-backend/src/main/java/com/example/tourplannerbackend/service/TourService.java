@@ -21,8 +21,8 @@ public class TourService {
         this.userRepository = userRepository;
     }
 
-    public List<Tour> getAllTours() {
-        return tourRepository.findAll();
+    public List<Tour> getAllTours(String username) {
+        return tourRepository.findByUserUsername(username);
     }
 
     public Tour createTour(Tour tour, String username) {

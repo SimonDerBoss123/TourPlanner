@@ -20,8 +20,11 @@ public class TourController {
     }
 
     @GetMapping
-    public List<Tour> getAllTours() {
-        return tourService.getAllTours();
+    public List<Tour> getAllTours(@RequestHeader ("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+        return tourService.getAllTours(username);
+
     }
 
     @PostMapping

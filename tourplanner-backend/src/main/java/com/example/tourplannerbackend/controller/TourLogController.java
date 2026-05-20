@@ -7,7 +7,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/tourLogs")
+@RequestMapping("/api/tours/{tourId}/tourlogs")
 @CrossOrigin(origins = "http://localhost:3000")
 public class TourLogController {
 
@@ -18,13 +18,13 @@ public class TourLogController {
     }
 
     @GetMapping
-    public List<TourLog> getAllTourLogs(){
+    public List<TourLog> getAllTourLogs(@PathVariable Long tourId){
         return tourLogService.getAllTourLogs();
     }
 
     @PostMapping
-    public TourLog createTourLog(@RequestBody TourLog tourLog){
-        return tourLogService.createTourLog(tourLog);
+    public TourLog createTourLog(@PathVariable Long tourId, @RequestBody TourLog tourLog){
+        return tourLogService.createTourLog(tourId,tourLog);
     }
 
     @DeleteMapping("/{id}")

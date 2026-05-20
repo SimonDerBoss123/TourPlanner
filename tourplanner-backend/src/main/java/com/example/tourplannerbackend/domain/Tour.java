@@ -16,6 +16,9 @@ public class Tour {
     private String description;
     private String fromLocation;
     private String toLocation;
+    private String transportType;
+    private Double tourDistance;
+    private Integer estimatedTime;
 
     @JsonIgnore
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
