@@ -1,26 +1,45 @@
-import {createFileRoute} from '@tanstack/react-router'
-import {useState} from 'react'
+import React, { useState } from 'react'
 import { Button } from '#components/ui/button'
 import { Input } from '#components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '#components/ui/card'
-import { Label } from '#components/ui/label'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+
 export const Route = createFileRoute('/login')({
-    component: LoginPage,
+    validateSearch: (search) => ({
+        redirect: (search.redirect as string) || '/',
+    }),
+    beforeLoad: ({ context, search }) => {
+        // Redirect if already authenticated
+        if (context.auth.isAuthenticated) {
+            throw redirect({ to: search.redirect })
+        }
+    },
+    component: LoginComponent,
 })
 
+function LoginComponent() {
+    const { auth } = Route.useRouteContext()
+    const { redirect } = Route.useSearch()
+    const navigate = Route.useNavigate()
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
 
-function LoginPage() {
-    const [username,setUsername] = useState('')
-    const [password,setPassword] = useState('')
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsLoading(true)
+        setError('')
 
-    const handleLogin = async () => {
-        const response = await fetch('http://localhost:8080/api/users/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username,password}),
-        })
-        const data = await response.json();
-        console.log(data);
+        try {
+            await auth.login(username, password)
+            // Navigate to the redirect URL using router navigation
+            navigate({ to: redirect })
+        } catch (err) {
+            setError('Invalid username or password')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -31,26 +50,32 @@ function LoginPage() {
                 </CardHeader>
                 <CardContent>
                     {/* Input Felder */}
-                    <Input className = "mb-2"
-                        value = {username}
-                        onChange = {e => setUsername(e.target.value)}
-                        placeholder = "Username"
+                    <Input className="mb-2"
+                           value={username}
+                           onChange={e => setUsername(e.target.value)}
+                           placeholder="Username"
                     />
-                    <Input className = "mb-4"
-                        value = {password}
-                        onChange = {e => setPassword(e.target.value)}
-                        placeholder = "Passwort"
+                    <Input className="mb-4"
+                           value={password}
+                           onChange={e => setPassword(e.target.value)}
+                           placeholder="Passwort"
                     />
 
                     {/* Login Button */}
-                    <Button onClick = {handleLogin}>Login</Button>
+                    <Button
+                        type="submit"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                    >
+                        Login
+                    </Button>
 
 
                 </CardContent>
             </Card>
         </div>
+
     )
 }
-
 
 

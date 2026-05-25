@@ -6,7 +6,7 @@ interface User {
     // kein password weil wird nie an Frontend geschickt @JsonIgnore im Backend
 }
 
-interface AuthState {
+export interface AuthState {
     isAuthenticated: boolean
     user: User | null
     login: (username: string, password: string) => Promise<void>
@@ -25,13 +25,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const token = localStorage.getItem('auth-token')
         if (token) {
             // Validate token with your API
-            fetch('/api/validate-token', {
+            fetch('http://localhost:8080/api/users/validate', {
                 headers: { Authorization: `Bearer ${token}` },
             })
-                .then((response) => response.json())
-                .then((userData) => {
-                    if (userData.valid) {
-                        setUser(userData.user)
+                .then((response) => {
+                    if (response.ok) {
                         setIsAuthenticated(true)
                     } else {
                         localStorage.removeItem('auth-token')
@@ -59,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = async (username: string, password: string) => {
         // Replace with your authentication logic
-        const response = await fetch('/api/users/login', {
+        const response = await fetch('http://localhost:8080/api/users/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),
