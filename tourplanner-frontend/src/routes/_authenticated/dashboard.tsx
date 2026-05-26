@@ -7,6 +7,7 @@ import type {Tour} from "../../components/dashboard/TourCard.tsx";
 import {useAuth} from "../../auth.tsx";
 import SearchBar from "../../components/dashboard/SearchBar.tsx";
 import TourCard from "../../components/dashboard/TourCard.tsx";
+import NewTourModal from "../../components/dashboard/NewTourModal.tsx";
 export const Route = createFileRoute('/_authenticated/dashboard')({
     component: DashboardComponent,
 })
@@ -17,16 +18,18 @@ function DashboardComponent() {
     const auth = useAuth()
     const [search, setSearch] = useState('')
     const[tours, setTours] = useState<Tour[]>([])
+    const [isOpen,setIsOpen] = useState(false)
+
+    const fetchTours = async () => {
+        const token = localStorage.getItem('auth-token');
+        const response = await fetch('http://localhost:8080/api/tours',{
+            headers: {Authorization: `Bearer ${token}`}
+        });
+        const data = await response.json();
+        setTours(data);
+    }
 
 useEffect(() =>{
-    const fetchTours = async () => {
-       const token = localStorage.getItem('auth-token');
-       const response = await fetch('http://localhost:8080/api/tours',{
-           headers: {Authorization: `Bearer ${token}`}
-       });
-       const data = await response.json();
-       setTours(data);
-    }
     fetchTours();
 },[])
 
@@ -34,6 +37,7 @@ useEffect(() =>{
         <div className="min-h-screen bg-background">
             <Navbar />
             <main className="max-w-6xl mx-auto px-6 py-10">
+                <NewTourModal isOpen={isOpen} onClose={() => setIsOpen(false)} onSuccess={fetchTours} />
 
                 {/* Header */}
                 <div className="flex items-end justify-between mb-8">
@@ -43,7 +47,9 @@ useEffect(() =>{
                             {auth.user?.username}
                         </h1>
                     </div>
-                    <Button size="sm" className="gap-1.5">
+                    <Button size="sm" className="gap-1.5"
+                    onClick={() => setIsOpen(true)}>
+
                         <Plus className="w-4 h-4" />
                         New Tour
                     </Button>

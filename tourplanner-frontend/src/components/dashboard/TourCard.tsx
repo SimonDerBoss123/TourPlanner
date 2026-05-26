@@ -1,4 +1,6 @@
 import type {StatsRowProps} from "./StatsRow.tsx";
+import {Card, CardContent} from "../ui/card.tsx";
+import {Badge, ChevronRight, Clock, MapPin, Mountain, RouteIcon} from "lucide-react";
 
 export interface Tour {
     id: number
