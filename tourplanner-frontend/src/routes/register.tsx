@@ -3,8 +3,9 @@ import { Button } from '#components/ui/button'
 import { Input } from '#components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '#components/ui/card'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import {useAuth} from "../auth.tsx";
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute('/register')({
     validateSearch: (search) => ({
         redirect: (search.redirect as string) || '/',
     }),
@@ -14,17 +15,16 @@ export const Route = createFileRoute('/login')({
             throw redirect({ to: search.redirect })
         }
     },
-    component: LoginComponent,
+    component: RegisterComponent,
 })
-
-function LoginComponent() {
+function RegisterComponent() {
+    const navigate = Route.useNavigate()
     const { auth } = Route.useRouteContext()
     const { redirect } = Route.useSearch()
-    const navigate = Route.useNavigate()
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState('')
+    const [username,setUsername] = useState('')
+    const [password,setPassword] = useState('')
+    const [isLoading,setIsLoading] = useState(false)
+    const [error,setError] = useState('')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -32,7 +32,7 @@ function LoginComponent() {
         setError('')
 
         try {
-            await auth.login(username, password)
+            await auth.register(username, password)
             // Navigate to the redirect URL using router navigation
             navigate({ to: redirect })
         } catch (err) {
@@ -46,7 +46,7 @@ function LoginComponent() {
         <div className="min-h-screen flex items-center justify-center">
             <Card className="w-full max-w-sm">
                 <CardHeader>
-                    <CardTitle>Login</CardTitle>
+                    <CardTitle>Register</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {/* Input Felder */}
@@ -67,16 +67,12 @@ function LoginComponent() {
                         onClick={handleSubmit}
                         disabled={isLoading}
                     >
-                        Login
+                        Registrieren
                     </Button>
 
 
                 </CardContent>
             </Card>
-            <Link> </Link>
         </div>
-
     )
 }
-
-

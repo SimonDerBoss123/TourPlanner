@@ -11,6 +11,7 @@ export interface AuthState {
     user: User | null
     login: (username: string, password: string) => Promise<void>
     logout: () => void
+    register: (username: string, password: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
@@ -74,6 +75,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    const register = async (username:string,password:string) => {
+        const response = await fetch('http://localhost:8080/api/users/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        })
+        if(response.ok){
+            const userData = await response.json();
+            setUser(userData);
+            setIsAuthenticated(true);
+            localStorage.setItem('auth-token', userData.token);
+        }
+        else {
+            throw new Error('Authentication failed')
+        }
+    }
+
     const logout = () => {
         setUser(null)
         setIsAuthenticated(false)
@@ -81,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     )

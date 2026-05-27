@@ -4,9 +4,17 @@ import {Avatar, AvatarFallback} from "../ui/avatar.tsx";
 import {Separator} from "../ui/separator.tsx";
 import {Button} from "../ui/button.tsx";
 import {useAuth} from "../../auth.tsx";
+import {useNavigate} from "@tanstack/react-router";
+
 
 export function Navbar(){
     const auth =useAuth();
+    const navigate = useNavigate();
+
+    const handleLogOut = () => {
+        auth.logout();
+        navigate({to: '/login'});
+    }
 
     return (
         <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
@@ -26,7 +34,7 @@ export function Navbar(){
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={auth.logout}
+                        onClick={handleLogOut}
                         className="text-muted-foreground hover:text-foreground gap-1.5"
                     >
                         <LogOut className="w-3.5 h-3.5" />
