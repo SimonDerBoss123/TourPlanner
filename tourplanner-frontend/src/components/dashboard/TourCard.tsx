@@ -1,7 +1,7 @@
-import type {StatsRowProps} from "./StatsRow.tsx";
 import {Card, CardContent} from "../ui/card.tsx";
-import {Badge, ChevronRight, Clock, MapPin, Mountain, RouteIcon} from "lucide-react";
-
+import { ChevronRight, Clock, MapPin, Mountain, Route as RouteIcon } from 'lucide-react'
+import { Badge } from '../ui/badge'
+import { Link } from '@tanstack/react-router'
 export interface Tour {
     id: number
     name: string
@@ -18,6 +18,7 @@ export interface TourCardProps {
 
 export default function TourCard({ tour }: TourCardProps) {
     return (
+        <Link to="/tours/$tourId" params={{tourId: String(tour.id)}}>
         <Card className="border-0 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
             <CardContent className="py-4 px-5">
                 <div className="flex items-center justify-between">
@@ -59,5 +60,6 @@ export default function TourCard({ tour }: TourCardProps) {
                 </div>
             </CardContent>
         </Card>
+        </Link>
     )
 }
