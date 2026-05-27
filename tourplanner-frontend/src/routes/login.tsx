@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Button } from '#components/ui/button'
 import { Input } from '#components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '#components/ui/card'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import {createFileRoute, Link, redirect} from '@tanstack/react-router'
 
 export const Route = createFileRoute('/login')({
     validateSearch: (search) => ({
@@ -43,8 +43,8 @@ function LoginComponent() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <Card className="w-full max-w-sm">
+        <div className="min-h-screen flex items-center justify-center flex-col">
+            <Card className="w-full max-w-sm mb-2">
                 <CardHeader>
                     <CardTitle>Login</CardTitle>
                 </CardHeader>
@@ -73,7 +73,12 @@ function LoginComponent() {
 
                 </CardContent>
             </Card>
-            <Link> </Link>
+            <p className="text-sm text-center text-muted-foreground mt-4">
+                Noch kein Account? {' '}
+                <Link to="/register" className="underline">
+                    Hier registrieren.
+                </Link>
+            </p>
         </div>
 
     )
