@@ -60,7 +60,7 @@ function RegisterComponent() {
                            placeholder="Passwort"
                     />
 
-                    {/* Login Button */}
+                    {/* Register Button */}
                     <Button
                         type="submit"
                         onClick={handleSubmit}
