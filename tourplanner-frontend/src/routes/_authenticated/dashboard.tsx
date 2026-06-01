@@ -8,6 +8,7 @@ import {useAuth} from "../../auth.tsx";
 import SearchBar from "../../components/dashboard/SearchBar.tsx";
 import TourCard from "../../components/dashboard/TourCard.tsx";
 import NewTourModal from "../../components/dashboard/NewTourModal.tsx";
+import {tourService} from "../../services/tourService.tsx";
 export const Route = createFileRoute('/_authenticated/dashboard')({
     component: DashboardComponent,
 })
@@ -17,21 +18,20 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 function DashboardComponent() {
     const auth = useAuth()
     const [search, setSearch] = useState('')
-    const[tours, setTours] = useState<Tour[]>([])
+    const [tours, setTours] = useState<Tour[]>([])
     const [isOpen,setIsOpen] = useState(false)
 
-    const fetchTours = async () => {
-        const token = localStorage.getItem('auth-token');
-        const response = await fetch('http://localhost:8080/api/tours',{
-            headers: {Authorization: `Bearer ${token}`}
-        });
-        const data = await response.json();
+
+const fetchTours = async () => {
+        const data = await tourService.getAll();
         setTours(data);
-    }
+}
+
 
 useEffect(() =>{
     fetchTours();
 },[])
+
 
     return (
         <div className="min-h-screen bg-background">

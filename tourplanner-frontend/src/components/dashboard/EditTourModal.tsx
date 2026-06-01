@@ -1,32 +1,39 @@
 import {useState} from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
-import {Input} from "../ui/input.tsx";
-import {Button} from "../ui/button.tsx";
 import {tourService} from "../../services/tourService.tsx";
+import {Dialog, DialogContent, DialogHeader, DialogTitle} from "#components/ui/dialog";
+import {Input} from "#components/ui/input";
+import {Button} from "#components/ui/button";
 
 
-
-export interface NewTourModalProps{
+export interface EditTourModalProps{
     isOpen: boolean,
-    onClose: () => void
+    onClose: () => void,
     onSuccess: () => void
+    tour: {
+        name: string
+        description: string
+        fromLocation: string
+        toLocation: string
+        transportType: string
+    },
+    tourId: string
 }
 
+export default function EditTourModal({isOpen,onClose,onSuccess, tourId, tour} : EditTourModalProps){
+    const [name,setName] = useState(tour.name)
+    const [description,setDescription] = useState(tour.description)
+    const [fromLocation, setFromLocation] = useState(tour.fromLocation)
+    const [to, setTo] = useState(tour.toLocation)
+    const [transportType,setTransportType] = useState(tour.transportType)
 
-export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalProps){
-    const [name,setName] = useState('')
-    const [description,setDescription] = useState('')
-    const [fromLocation, setFromLocation] = useState('')
-    const [to, setTo] = useState('')
-    const [transportType,setTransportType] = useState('')
 
-    const handleSubmit = async () => {
-        const response = await tourService.create(
-            {name, description, fromLocation, toLocation: to, transportType}
+    const handleSubmit = async() => {
+        const response = await tourService.update(
+            {name, description, fromLocation, toLocation: to, transportType}, Number(tourId)
         )
         if(response){
-            onClose();
-            onSuccess();
+            onClose()
+            onSuccess()
         }
     }
 
@@ -34,7 +41,7 @@ export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalPr
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>New Tour</DialogTitle>
+                    <DialogTitle>Edit Tour</DialogTitle>
                 </DialogHeader>
                 {/* Formular hier */}
                 <div className="flex flex-col gap-4">
@@ -65,12 +72,12 @@ export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalPr
                     />
 
                     <Button type="submit"
-                    onClick={handleSubmit}>
+                            onClick={handleSubmit}>
                         Submit
                     </Button>
                 </div>
             </DialogContent>
         </Dialog>
-
     )
+
 }

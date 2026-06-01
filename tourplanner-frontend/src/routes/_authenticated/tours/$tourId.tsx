@@ -2,6 +2,10 @@ import {createFileRoute, useNavigate, Link} from '@tanstack/react-router'
 import React, {useEffect, useState} from "react";
 import {Navbar} from "../../../components/dashboard/Navbar.tsx";
 import NewTourLogModal from "../../../components/dashboard/NewTourLogModal.tsx";
+import {tourService} from "../../../services/tourService.tsx";
+import {tourLogService} from "../../../services/tourLogService.tsx";
+import EditTourModal from "../../../components/dashboard/EditTourModal.tsx";
+
 
 export const Route = createFileRoute('/_authenticated/tours/$tourId')({
   component: TourDetailPage,
@@ -13,30 +17,22 @@ function TourDetailPage() {
   const [tour,setTour] = useState(null);
   const [tourLogs,setTourLogs] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false)
 
    useEffect(() => {
-     fetchTour()
-     fetchTourLogs()
+     fetchTour();
+     fetchTourLogs();
    },[])
 
   const fetchTourLogs = async () => {
-    const token = localStorage.getItem('auth-token');
-    const response = await fetch(`http://localhost:8080/api/tours/${tourId}/tourlogs`,{
-      headers:{ Authorization: `Bearer ${token}`}
-    });
-
-    const data = await response.json();
-    setTourLogs(data);
+    const response = await tourLogService.getById(Number(tourId));
+    setTourLogs(response);
   }
 
-  const fetchTour = async () =>{
-    const token = localStorage.getItem('auth-token')
-    const response = await fetch(`http://localhost:8080/api/tours/${tourId}`,{
-      headers:{ Authorization: `Bearer ${token}`}
-    });
 
-    const data = await response.json();
-    setTour(data);
+  const fetchTour = async () => {
+     const response = await tourService.getById(Number(tourId));
+     setTour(response);
   }
 
   const formatTime = (totalMinutes: number) => {
@@ -64,6 +60,14 @@ function TourDetailPage() {
 
         />
 
+        <EditTourModal
+            isOpen={isEditOpen}
+            onClose={ () => setIsEditOpen(false)}
+            onSuccess={fetchTour}
+            tour={tour}
+            tourId={tourId}
+        />
+
         <main className="max-w-6xl mx-auto px-6 py-10">
 
           {/* Back Button */}
@@ -79,8 +83,22 @@ function TourDetailPage() {
               <p className="text-muted-foreground text-sm">{tour.fromLocation} → {tour.toLocation}</p>
             </div>
             <div className="flex gap-2">
-              <button className="text-sm border rounded px-3 py-1">Edit</button>
-              <button className="text-sm border rounded px-3 py-1 text-destructive">Delete</button>
+
+              <button className="text-sm border rounded px-3 py-1"
+              onClick={ async () => {
+                setIsEditOpen(true)
+              }}>
+                Edit
+              </button>
+
+              <button className="text-sm border rounded px-3 py-1 text-destructive"
+              onClick={ async () => {
+                await tourService.delete(Number(tourId));
+                navigate({to: '/dashboard'})
+              }}>
+                Delete
+              </button>
+
             </div>
           </div>
 
