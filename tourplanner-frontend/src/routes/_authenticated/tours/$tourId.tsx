@@ -5,6 +5,8 @@ import NewTourLogModal from "../../../components/dashboard/NewTourLogModal.tsx";
 import {tourService} from "../../../services/tourService.tsx";
 import {tourLogService} from "../../../services/tourLogService.tsx";
 import EditTourModal from "../../../components/dashboard/EditTourModal.tsx";
+import EditTourLogModal from "../../../components/dashboard/EditTourLogModal.tsx";
+
 
 
 export const Route = createFileRoute('/_authenticated/tours/$tourId')({
@@ -18,6 +20,8 @@ function TourDetailPage() {
   const [tourLogs,setTourLogs] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [selectedLog, setSelectedLog] = useState(null)
+  const [isLogEditOpen, setIsLogEditOpen] = useState(false)
 
    useEffect(() => {
      fetchTour();
@@ -68,6 +72,17 @@ function TourDetailPage() {
             tourId={tourId}
         />
 
+        {selectedLog && (
+            <EditTourLogModal
+                isOpen={isLogEditOpen}
+                onClose={() => setIsLogEditOpen(false)}
+                onSuccess={fetchTourLogs}
+                logId={selectedLog?.id}
+                tourId={Number(tourId)}
+                tourLog={selectedLog}
+            />
+        )}
+
         <main className="max-w-6xl mx-auto px-6 py-10">
 
           {/* Back Button */}
@@ -84,14 +99,14 @@ function TourDetailPage() {
             </div>
             <div className="flex gap-2">
 
-              <button className="text-sm border rounded px-3 py-1"
+              <button className="cursor-pointer text-sm border rounded px-3 py-1"
               onClick={ async () => {
                 setIsEditOpen(true)
               }}>
                 Edit
               </button>
 
-              <button className="text-sm border rounded px-3 py-1 text-destructive"
+              <button className="cursor-pointer text-sm border rounded px-3 py-1 text-destructive"
               onClick={ async () => {
                 await tourService.delete(Number(tourId));
                 navigate({to: '/dashboard'})
@@ -121,10 +136,12 @@ function TourDetailPage() {
           {/* TourLogs Header */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Tour Logs</h2>
-            <button className="text-sm bg-primary text-primary-foreground rounded px-3 py-1"
+
+            <button className="cursor-pointer text-sm bg-primary text-primary-foreground rounded px-3 py-1"
               onClick={() => setIsOpen(true)}>
               + Add Log
             </button>
+
           </div>
 
           {/* TourLogs Liste */}
@@ -140,9 +157,26 @@ function TourDetailPage() {
                     <span>💪 {log.difficulty}/5</span>
                     <span>{log.totalDistance} km</span>
                     <span>{formatTime(log.totalTime)} min</span>
+
+                    <button className="text-destructive text-xs hover:underline cursor-pointer"
+                            onClick = { async () => {
+                              await tourLogService.delete(log.id, Number(tourId));
+                              fetchTourLogs();
+                            }}
+                    >
+                      Delete
+                    </button>
+                    <button className="text-xs hover:underline cursor-pointer"
+                    onClick={ async ()=> {
+                      setSelectedLog(log);
+                      setIsLogEditOpen(true);
+                    }}>Edit</button>
+
+
                   </div>
                 </div>
               </div>
+
           ))}
 
         </main>
