@@ -1,4 +1,5 @@
 # TourPlanner
+**Repository:** https://github.com/SimonDerBoss123/TourPlanner
 
 A full-stack web application for planning and managing tours and tour logs. Built with Spring Boot and React as part of a semester project.
 
