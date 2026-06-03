@@ -1,11 +1,10 @@
-import {createFileRoute, useNavigate, Link} from '@tanstack/react-router'
-import React, {useEffect, useState} from "react";
+import {createFileRoute} from '@tanstack/react-router'
 import {Navbar} from "../../../components/dashboard/Navbar.tsx";
 import NewTourLogModal from "../../../components/dashboard/NewTourLogModal.tsx";
-import {tourService} from "../../../services/tourService.tsx";
-import {tourLogService} from "../../../services/tourLogService.tsx";
 import EditTourModal from "../../../components/dashboard/EditTourModal.tsx";
 import EditTourLogModal from "../../../components/dashboard/EditTourLogModal.tsx";
+import { useTourDetail } from '../../../hooks/useTourDetail'
+import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 
 
 
@@ -15,42 +14,26 @@ export const Route = createFileRoute('/_authenticated/tours/$tourId')({
 
 
 function TourDetailPage() {
-  const { tourId } = Route.useParams();
-  const [tour,setTour] = useState(null);
-  const [tourLogs,setTourLogs] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const [selectedLog, setSelectedLog] = useState(null)
-  const [isLogEditOpen, setIsLogEditOpen] = useState(false)
-
-   useEffect(() => {
-     fetchTour();
-     fetchTourLogs();
-   },[])
-
-  const fetchTourLogs = async () => {
-    const response = await tourLogService.getById(Number(tourId));
-    setTourLogs(response);
-  }
-
-
-  const fetchTour = async () => {
-     const response = await tourService.getById(Number(tourId));
-     setTour(response);
-  }
-
-  const formatTime = (totalMinutes: number) => {
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = totalMinutes % 60
-    if (hours === 0) return `${minutes}m`
-    if (minutes === 0) return `${hours}h`
-    return `${hours}h ${minutes}m`
-  }
-
-  const navigate = useNavigate();
-
-
-  if(!tour) return <div>Loading...</div>
+  const {tourId} = Route.useParams()
+  const {
+    tour,
+    tourLogs,
+    isOpen,
+    setIsOpen,
+    isEditOpen,
+    setIsEditOpen,
+    isLogEditOpen,
+    setIsLogEditOpen,
+    selectedLog,
+    setSelectedLog,
+    fetchTour,
+    fetchTourLogs,
+    formatTime,
+    navigate,
+    deleteTourLog,
+    deleteTour
+  } = useTourDetail(tourId)
+  if (!tour) return <div>Loading...</div>
 
   return (
       <div className="min-h-screen bg-background">
@@ -59,19 +42,16 @@ function TourDetailPage() {
         <NewTourLogModal
             tourId={tourId}
             isOpen={isOpen}
-            onClose = {() => setIsOpen(false)}
-            onSuccess = {fetchTourLogs}
-
+            onClose={() => setIsOpen(false)}
+            onSuccess={fetchTourLogs}
         />
-
         <EditTourModal
             isOpen={isEditOpen}
-            onClose={ () => setIsEditOpen(false)}
+            onClose={() => setIsEditOpen(false)}
             onSuccess={fetchTour}
             tour={tour}
             tourId={tourId}
         />
-
         {selectedLog && (
             <EditTourLogModal
                 isOpen={isLogEditOpen}
@@ -83,105 +63,110 @@ function TourDetailPage() {
             />
         )}
 
-        <main className="max-w-6xl mx-auto px-6 py-10">
+        <main className="max-w-5xl mx-auto px-12 py-10">
 
-          {/* Back Button */}
-          <button className="text-sm text-muted-foreground mb-6 flex items-center gap-1 cursor-pointer"
-          onClick={() => navigate({to: '/dashboard'})}>
-            ← Back
+          <button
+              className="text-xs text-muted-foreground mb-8 flex items-center gap-1.5 cursor-pointer hover:text-foreground transition-colors"
+              onClick={() => navigate({to: '/dashboard'})}>
+            ← Back to Tours
           </button>
 
-          {/* Tour Header */}
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight mb-1">{tour.name}</h1>
-              <p className="text-muted-foreground text-sm">{tour.fromLocation} → {tour.toLocation}</p>
+              <h1 className="text-3xl font-semibold tracking-tight">{tour.name}</h1>
+              <p className="text-muted-foreground text-sm mt-1">{tour.fromLocation} → {tour.toLocation}</p>
             </div>
-            <div className="flex gap-2">
-
-              <button className="cursor-pointer text-sm border rounded px-3 py-1"
-              onClick={ async () => {
-                setIsEditOpen(true)
-              }}>
+            <div className="flex gap-2 mt-1">
+              <button
+                  className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border bg-background hover:bg-muted transition-colors"
+                  onClick={() => setIsEditOpen(true)}>
                 Edit
               </button>
-
-              <button className="cursor-pointer text-sm border rounded px-3 py-1 text-destructive"
-              onClick={ async () => {
-                await tourService.delete(Number(tourId));
-                navigate({to: '/dashboard'})
-              }}>
+              <button
+                  className="cursor-pointer text-xs px-3 py-1.5 rounded-lg text-destructive border border-destructive/30 hover:bg-destructive/5 transition-colors"
+                  onClick={deleteTour}>
                 Delete
               </button>
-
             </div>
           </div>
 
-          {/* Tour Info */}
-          <div className="grid grid-cols-3 gap-4 mb-10">
-            <div className="bg-muted/40 rounded-xl p-4">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Transport</p>
-              <p className="font-medium">{tour.transportType}</p>
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Transport</p>
+              <p className="text-sm font-medium">{tour.transportType || '—'}</p>
             </div>
-            <div className="bg-muted/40 rounded-xl p-4">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Distance</p>
-              <p className="font-medium">{tour.totalDistance}</p>
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Distance</p>
+              <p className="text-sm font-medium">{tour.totalDistance ? `${tour.totalDistance} km` : '—'}</p>
             </div>
-            <div className="bg-muted/40 rounded-xl p-4">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Duration</p>
-              <p className="font-medium">{tour.estimatedTime}</p>
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Duration</p>
+              <p className="text-sm font-medium">{tour.estimatedTime ? `${tour.estimatedTime} min` : '—'}</p>
             </div>
           </div>
 
-          {/* TourLogs Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Tour Logs</h2>
+          <div className="grid grid-cols-2 gap-5">
 
-            <button className="cursor-pointer text-sm bg-primary text-primary-foreground rounded px-3 py-1"
-              onClick={() => setIsOpen(true)}>
-              + Add Log
-            </button>
+            <div className="rounded-xl overflow-hidden border" style={{ height: '380px', position: 'relative', zIndex: 0 }}>
+              <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[51.505, -0.09]}>
+                  <Popup>Route Placeholder</Popup>
+                </Marker>
+              </MapContainer>
+            </div>
 
-          </div>
-
-          {/* TourLogs Liste */}
-          {tourLogs.map((log) => (
-              <div key={log.id} className="bg-muted/20 rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">{log.comment}</p>
-                    <p className="text-xs text-muted-foreground">{log.dateTime}</p>
-                  </div>
-                  <div className="flex gap-4 text-xs text-muted-foreground">
-                    <span>⭐ {log.rating}/5</span>
-                    <span>💪 {log.difficulty}/5</span>
-                    <span>{log.totalDistance} km</span>
-                    <span>{formatTime(log.totalTime)} min</span>
-
-                    <button className="text-destructive text-xs hover:underline cursor-pointer"
-                            onClick = { async () => {
-                              await tourLogService.delete(log.id, Number(tourId));
-                              fetchTourLogs();
-                            }}
-                    >
-                      Delete
-                    </button>
-                    <button className="text-xs hover:underline cursor-pointer"
-                    onClick={ async ()=> {
-                      setSelectedLog(log);
-                      setIsLogEditOpen(true);
-                    }}>Edit</button>
-
-
-                  </div>
-                </div>
+            <div className="flex flex-col" style={{ height: '380px' }}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold">Tour Logs</h2>
+                <button
+                    className="cursor-pointer text-xs px-3 py-1.5 rounded-lg bg-foreground text-background hover:opacity-80 transition-opacity"
+                    onClick={() => setIsOpen(true)}>
+                  + Add Log
+                </button>
               </div>
 
-          ))}
+              <div className="flex flex-col gap-2 overflow-y-auto pr-1">
+                {tourLogs.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center mt-10">No logs yet.</p>
+                )}
+                {tourLogs.map((log) => (
+                    <div key={log.id} className="rounded-xl border px-4 py-3 hover:bg-muted/20 transition-colors">
+                      <div className="flex items-start justify-between mb-2.5">
+                        <div>
+                          <p className="text-xs font-medium mb-4">{log.comment}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{log.dateTime}</p>
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                              className="text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                              onClick={() => { setSelectedLog(log); setIsLogEditOpen(true); }}>
+                            Edit
+                          </button>
+                          <button
+                              className="text-xs text-destructive hover:opacity-70 cursor-pointer transition-opacity"
+                              onClick={() => deleteTourLog(log.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        <span>Rating {log.rating}/5</span>
+                        <span>Difficulty {log.difficulty}/5</span>
+                        <span>{log.totalDistance} km</span>
+                        <span>{formatTime(log.totalTime)}</span>
+                      </div>
+                    </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
 
         </main>
       </div>
   )
-}
-
-
+  }

@@ -14,3 +14,5 @@ export const Route = createFileRoute('/_authenticated')({
     },
     component: () => <Outlet />,
 })
+
+//der guard für alle protected routes. checkt ob man eh eingeloggt ist wenn man zmb dashboard aufrufen will. sonst redirect

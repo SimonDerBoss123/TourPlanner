@@ -21,6 +21,12 @@ export default function NewTourLogModal({isOpen,onClose,onSuccess,tourId}: NewTo
     const [totalDistance,setTotalDistance] = useState('');
 
     const handleSubmit = async () => {
+        //validate input
+        if(parseInt(rating) < 1 || parseInt(rating) > 5) return;
+        if(parseInt(difficulty) < 1 || parseInt(difficulty) > 5) return;
+        if(!comment.trim()) return;
+        if(!dateTime) return;
+
         const token = localStorage.getItem('auth-token');
         const response = await fetch(`http://localhost:8080/api/tours/${tourId}/tourlogs`,{
             method: 'POST',
@@ -53,12 +59,18 @@ export default function NewTourLogModal({isOpen,onClose,onSuccess,tourId}: NewTo
                         onChange={e => setComment(e.target.value)}
                     />
                     <Input
-                        placeholder="Difficulty"
+                        placeholder="Difficulty 1-5"
+                        type="number"
+                        min={1}
+                        max={5}
                         value={difficulty}
                         onChange={e => setDifficulty(e.target.value)}
                     />
                     <Input
-                        placeholder="Rating"
+                        placeholder="Rating 1-5"
+                        min={1}
+                        max={5}
+                        type={"number"}
                         value={rating}
                         onChange={e => setRating(e.target.value)}
                     />
@@ -80,7 +92,8 @@ export default function NewTourLogModal({isOpen,onClose,onSuccess,tourId}: NewTo
                     />
 
                     <Button type="submit"
-                            onClick={handleSubmit}>
+                            onClick={handleSubmit}
+                            disabled={!comment || !rating || !difficulty || !dateTime}>
                         Add
                     </Button>
                 </div>

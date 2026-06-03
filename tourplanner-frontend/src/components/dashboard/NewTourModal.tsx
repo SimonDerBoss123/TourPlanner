@@ -21,10 +21,19 @@ export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalPr
     const [transportType,setTransportType] = useState('')
 
     const handleSubmit = async () => {
+        //validate input
+
+        if(!name || !description || !fromLocation || !to || !transportType) return
+
         const response = await tourService.create(
             {name, description, fromLocation, toLocation: to, transportType}
         )
         if(response){
+            setName('')
+            setDescription('')
+            setFromLocation('')
+            setTo('')
+            setTransportType('')
             onClose();
             onSuccess();
         }
@@ -64,8 +73,11 @@ export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalPr
                         onChange={e => setTransportType(e.target.value)}
                     />
 
-                    <Button type="submit"
-                    onClick={handleSubmit}>
+                    <Button
+                        type="submit"
+                        onClick={handleSubmit}
+                        disabled={!name || !description || !fromLocation || !to || !transportType}
+                    >
                         Submit
                     </Button>
                 </div>
