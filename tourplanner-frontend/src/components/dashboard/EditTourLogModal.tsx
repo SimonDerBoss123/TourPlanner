@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {tourLogService} from "../../services/tourLogService.tsx";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "../ui/dialog"
 import {Input} from "../ui/input"
@@ -28,6 +28,16 @@ export default function EditTourLogModal({onSuccess,isOpen,onClose,logId,tourId,
     const [dateTime, setDateTime] = useState(tourLog.dateTime);
     const [totalDistance,setTotalDistance] = useState(tourLog.totalDistance);
 
+
+    useEffect(() => {
+        setComment(tourLog.comment)
+        setDifficulty(tourLog.difficulty)
+        setRating(tourLog.rating)
+        setTotalTime(tourLog.totalTime)
+        setDateTime(tourLog.dateTime)
+        setTotalDistance(tourLog.totalDistance)
+    }, [tourLog])
+
     const handleSubmit = async () => {
         const response = await tourLogService.update(Number(logId),Number(tourId),
             {comment,difficulty,rating,totalDistance,totalTime,dateTime}
@@ -42,7 +52,7 @@ export default function EditTourLogModal({onSuccess,isOpen,onClose,logId,tourId,
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>New Tour Log</DialogTitle>
+                    <DialogTitle>Edit Tour Log</DialogTitle>
                 </DialogHeader>
                 {/* Formular hier */}
                 <div className="flex flex-col gap-4">
@@ -80,7 +90,7 @@ export default function EditTourLogModal({onSuccess,isOpen,onClose,logId,tourId,
 
                     <Button type="submit"
                             onClick={handleSubmit}>
-                        Add
+                        Edit
                     </Button>
                 </div>
             </DialogContent>

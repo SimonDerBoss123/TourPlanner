@@ -73,7 +73,7 @@ export default function EditTourModal({isOpen,onClose,onSuccess, tourId, tour} :
 
                     <Button type="submit"
                             onClick={handleSubmit}>
-                        Submit
+                        Edit
                     </Button>
                 </div>
             </DialogContent>

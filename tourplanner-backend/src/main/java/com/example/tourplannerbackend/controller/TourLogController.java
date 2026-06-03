@@ -19,7 +19,7 @@ public class TourLogController {
 
     @GetMapping
     public List<TourLog> getAllTourLogs(@PathVariable Long tourId){
-        return tourLogService.getAllTourLogs();
+        return tourLogService.getTourLogsByTourId(tourId);
     }
 
     @PostMapping

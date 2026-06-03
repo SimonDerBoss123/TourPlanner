@@ -38,10 +38,12 @@ public class TourLogService {
         logger.info("TourLog deleted: {}", id);
     }
 
-    public TourLog updateTourLog(Long id, TourLog tourLog){
-        tourLog.setId(id);
+    public TourLog updateTourLog(Long id, TourLog updatedLog){
+        TourLog existing = tourLogRepository.findById(id).orElseThrow();
+        updatedLog.setId(id);
+        updatedLog.setTour(existing.getTour());
         logger.info("TourLog updated: {}", id);
-        return tourLogRepository.save(tourLog);
+        return tourLogRepository.save(updatedLog);
     }
 
     public TourLog getTourLogById(Long id){

@@ -38,6 +38,8 @@ export default function NewTourLogModal({isOpen,onClose,onSuccess,tourId}: NewTo
                     comment: comment, difficulty: parseInt(difficulty), rating: parseInt(rating), totalTime: parseInt(totalTime), dateTime: dateTime, totalDistance: parseInt(totalDistance)
                 })
         })
+        console.log('response ok:', response.ok)
+        console.log('status:', response.status)
         if(response.ok){
             onClose();
             onSuccess();
