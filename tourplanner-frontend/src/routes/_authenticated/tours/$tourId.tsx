@@ -4,7 +4,9 @@ import NewTourLogModal from "../../../components/dashboard/NewTourLogModal.tsx";
 import EditTourModal from "../../../components/dashboard/EditTourModal.tsx";
 import EditTourLogModal from "../../../components/dashboard/EditTourLogModal.tsx";
 import { useTourDetail } from '../../../hooks/useTourDetail'
-import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
+import {MapContainer, Polyline, TileLayer} from "react-leaflet";
+import polyline from '@mapbox/polyline';
+
 
 
 
@@ -34,6 +36,10 @@ function TourDetailPage() {
     deleteTour
   } = useTourDetail(tourId)
   if (!tour) return <div>Loading...</div>
+
+  const positions = tour.geometry
+      ? polyline.decode(tour.geometry).map(([lat, lng]) => [lat, lng])
+      : [[51.505, -0.09]];
 
   return (
       <div className="min-h-screen bg-background">
@@ -108,16 +114,14 @@ function TourDetailPage() {
           <div className="grid grid-cols-2 gap-5">
 
             <div className="rounded-xl overflow-hidden border" style={{ height: '380px', position: 'relative', zIndex: 0 }}>
-              <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[51.505, -0.09]}>
-                  <Popup>Route Placeholder</Popup>
-                </Marker>
-              </MapContainer>
-            </div>
+            <MapContainer center={positions[0]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+              <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Polyline positions={positions} color="blue" />
+            </MapContainer>
+          </div>
 
             <div className="flex flex-col" style={{ height: '380px' }}>
               <div className="flex items-center justify-between mb-3">
