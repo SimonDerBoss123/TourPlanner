@@ -67,11 +67,17 @@ export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalPr
                         value={to}
                         onChange={e => setTo(e.target.value)}
                     />
-                    <Input
-                        placeholder="transport type"
+                    <select
                         value={transportType}
                         onChange={e => setTransportType(e.target.value)}
-                    />
+                        className="border rounded-lg px-3 py-2 text-sm w-full bg-background"
+                    >
+                        <option value="">Select transport type</option>
+                        <option value="driving-car">Car</option>
+                        <option value="cycling-regular">Bike</option>
+                        <option value="foot-walking">Walking</option>
+                        <option value="hiking">Hiking</option>
+                    </select>
 
                     <Button
                         type="submit"
