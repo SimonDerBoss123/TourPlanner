@@ -1,6 +1,7 @@
 package com.example.tourplannerbackend.service;
 import com.example.tourplannerbackend.domain.User;
 import com.example.tourplannerbackend.domain.Tour;
+import com.example.tourplannerbackend.dto.RouteInfo;
 import com.example.tourplannerbackend.repository.TourRepository;
 import com.example.tourplannerbackend.repository.UserRepository;
 import com.example.tourplannerbackend.security.JwtUtil;
@@ -16,12 +17,14 @@ public class TourService {
     private final TourRepository tourRepository;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final OpenRouteService openRouteService;
 
 
-    public TourService(TourRepository tourRepository, JwtUtil jwtUtil, UserRepository userRepository) {
+    public TourService(TourRepository tourRepository, JwtUtil jwtUtil, UserRepository userRepository, OpenRouteService openRouteService) {
         this.tourRepository = tourRepository;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.openRouteService = openRouteService;
     }
 
     public List<Tour> getAllTours(String username) {
@@ -33,6 +36,12 @@ public class TourService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User nicht gefunden"));
         tour.setUser(user);
+
+        RouteInfo routeInfo= openRouteService.getRouteInfo(tour.getFromLocation(), tour.getToLocation(), tour.getTransportType());
+        tour.setTourDistance(routeInfo.getDistance());
+        tour.setEstimatedTime(routeInfo.getDuration());
+        tour.setGeometry(routeInfo.getGeometry());
+
         Tour savedTour = tourRepository.save(tour);
         logger.info("Tour '{}' created for user '{}'", savedTour.getName(), username);
         return savedTour;
@@ -44,7 +53,16 @@ public class TourService {
     }
 
     public Tour updateTour(Long id, Tour tour){
+        Tour existing = tourRepository.findById(id).orElseThrow();
         tour.setId(id);
+        tour.setUser(existing.getUser());
+
+        RouteInfo routeInfo = openRouteService.getRouteInfo(tour.getFromLocation(), tour.getToLocation(), tour.getTransportType());
+        tour.setTourDistance(routeInfo.getDistance());
+        tour.setEstimatedTime(routeInfo.getDuration());
+        tour.setGeometry(routeInfo.getGeometry());
+
+
         logger.info("Tour updated: {}", id);
         return tourRepository.save(tour);
     }

@@ -18,7 +18,11 @@ public class Tour {
     private String toLocation;
     private String transportType;
     private Double tourDistance;
-    private Integer estimatedTime;
+    private Double estimatedTime;
+
+    //erlaubt beliebig langen text
+    @Column(columnDefinition = "TEXT")
+    private String geometry;
 
     @JsonIgnore
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)

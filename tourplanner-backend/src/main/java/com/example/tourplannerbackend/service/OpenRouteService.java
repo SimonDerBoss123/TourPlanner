@@ -1,5 +1,6 @@
 package com.example.tourplannerbackend.service;
 
+import com.example.tourplannerbackend.dto.RouteInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +42,7 @@ public class OpenRouteService {
         }
     }
 
-    public double[] getRouteInfo(String from, String to, String transportType){
+    public RouteInfo getRouteInfo(String from, String to, String transportType){
 
         try{
             double[] fromCoords = getCoordinates(from);
@@ -64,8 +65,9 @@ public class OpenRouteService {
 
             double distance = summary.get("distance").asDouble();
             double duration = summary.get("duration").asDouble();
+            String geometry = root.get("routes").get(0).get("geometry").asText();
 
-            return new double[]{distance,duration};
+            return new RouteInfo(distance / 1000, duration / 60, geometry);
         }
         catch (Exception e){
             logger.error("No route availabe for this coordinates", e);
