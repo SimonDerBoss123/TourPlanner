@@ -34,4 +34,19 @@ public class Tour {
         if (tourLogs == null) return 0;
         return tourLogs.size();
     }
+
+    public boolean getChildFriendliness() {
+        if (tourLogs == null || tourLogs.isEmpty()) return false;
+
+        double avgDifficulty = tourLogs.stream()
+                .mapToInt(TourLog::getDifficulty)
+                .average()
+                .orElse(5);
+
+        boolean easyDifficulty = avgDifficulty <= 2;
+        boolean shortDistance = tourDistance != null && tourDistance <= 10;
+        boolean shortTime = estimatedTime != null && estimatedTime <= 60;
+
+        return easyDifficulty && shortDistance && shortTime;
+    }
 }
