@@ -37,8 +37,8 @@ function TourDetailPage() {
   } = useTourDetail(tourId)
   if (!tour) return <div>Loading...</div>
 
-  const positions = tour.geometry
-      ? polyline.decode(tour.geometry).map(([lat, lng]) => [lat, lng])
+  const positions: [number, number][] = tour.geometry
+      ? polyline.decode(tour.geometry).map(([lat, lng]): [number, number] => [lat, lng])
       : [[51.505, -0.09]];
 
   return (
@@ -96,32 +96,40 @@ function TourDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-5 gap-3 mb-8">
             <div className="rounded-xl border bg-muted/20 px-4 py-3">
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Transport</p>
               <p className="text-sm font-medium">{tour.transportType || '—'}</p>
             </div>
             <div className="rounded-xl border bg-muted/20 px-4 py-3">
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Distance</p>
-              <p className="text-sm font-medium">{tour.tourDistance ? `${tour.tourDistance} km` : '—'}</p>
+              <p className="text-sm font-medium">{tour.tourDistance ? `${tour.tourDistance.toFixed(1)} km` : '—'}</p>
             </div>
             <div className="rounded-xl border bg-muted/20 px-4 py-3">
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Duration</p>
-              <p className="text-sm font-medium">{tour.estimatedTime ? `${tour.estimatedTime} min` : '—'}</p>
+              <p className="text-sm font-medium">{tour.estimatedTime ? `${tour.estimatedTime.toFixed(0)} min` : '—'}</p>
+            </div>
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Popularity</p>
+              <p className="text-sm font-medium">{tour.popularity} {tour.popularity === 1 ? 'log' : 'logs'}</p>
+            </div>
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Child Friendly</p>
+              <p className="text-sm font-medium">{tour.childFriendliness ? '✓ Yes' : '✗ No'}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-5">
 
             <div className="rounded-xl overflow-hidden border" style={{ height: '380px', position: 'relative', zIndex: 0 }}>
-            <MapContainer center={positions[0]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-              <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <Polyline positions={positions} color="blue" />
-            </MapContainer>
-          </div>
+              <MapContainer center={positions[0]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Polyline positions={positions} color="blue" />
+              </MapContainer>
+            </div>
 
             <div className="flex flex-col" style={{ height: '380px' }}>
               <div className="flex items-center justify-between mb-3">

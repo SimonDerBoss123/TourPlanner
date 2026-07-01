@@ -3,13 +3,37 @@ import {tourService} from "../services/tourService.tsx";
 import {tourLogService} from "../services/tourLogService.tsx";
 import {useNavigate} from "@tanstack/react-router";
 
+export interface Tour {
+    id: number
+    name: string
+    fromLocation: string
+    toLocation: string
+    transportType: string
+    tourDistance: number
+    estimatedTime: number
+    geometry: string
+    popularity: number
+    childFriendliness: boolean
+    description: string
+}
+
+export interface TourLog {
+    id: number
+    comment: string
+    dateTime: string
+    difficulty: number
+    rating: number
+    totalDistance: number
+    totalTime: number
+}
+
 export function useTourDetail(tourId:string) {
 
-    const [tour,setTour] = useState(null);
-    const [tourLogs,setTourLogs] = useState([]);
+    const [tour, setTour] = useState<Tour | null>(null);
+    const [tourLogs, setTourLogs] = useState<TourLog[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false)
-    const [selectedLog, setSelectedLog] = useState(null)
+    const [selectedLog, setSelectedLog] = useState<TourLog | null>(null)
     const [isLogEditOpen, setIsLogEditOpen] = useState(false)
 
     useEffect(() => {

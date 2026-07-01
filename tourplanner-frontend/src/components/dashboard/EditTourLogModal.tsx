@@ -12,30 +12,30 @@ export interface EditTourLogModalProps{
     tourId: number,
     tourLog: {
         comment: string,
-        difficulty: string,
-        rating: string,
-        totalTime: string,
+        difficulty: number,
+        rating: number,
+        totalTime: number,
         dateTime: string,
-        totalDistance: string
+        totalDistance: number
     }
 }
 
 export default function EditTourLogModal({onSuccess,isOpen,onClose,logId,tourId,tourLog}: EditTourLogModalProps){
     const [comment,setComment] = useState(tourLog.comment);
-    const [difficulty,setDifficulty] = useState(tourLog.difficulty);
-    const [rating,setRating] = useState(tourLog.rating);
-    const [totalTime,setTotalTime] = useState(tourLog.totalTime);
+    const [difficulty,setDifficulty] = useState(tourLog.difficulty.toString());
+    const [rating,setRating] = useState(tourLog.rating.toString());
+    const [totalTime,setTotalTime] = useState(tourLog.totalTime.toString());
     const [dateTime, setDateTime] = useState(tourLog.dateTime);
-    const [totalDistance,setTotalDistance] = useState(tourLog.totalDistance);
+    const [totalDistance,setTotalDistance] = useState(tourLog.totalDistance.toString());
 
 
     useEffect(() => {
         setComment(tourLog.comment)
-        setDifficulty(tourLog.difficulty)
-        setRating(tourLog.rating)
-        setTotalTime(tourLog.totalTime)
+        setDifficulty(tourLog.difficulty.toString())
+        setRating(tourLog.rating.toString())
+        setTotalTime(tourLog.totalTime.toString())
         setDateTime(tourLog.dateTime)
-        setTotalDistance(tourLog.totalDistance)
+        setTotalDistance(tourLog.totalDistance.toString())
     }, [tourLog])
 
     const handleSubmit = async () => {
