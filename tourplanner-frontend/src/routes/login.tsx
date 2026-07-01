@@ -61,13 +61,17 @@ function LoginComponent() {
                            placeholder="Passwort"
                     />
 
+                    {error && (
+                        <p className="text-xs text-destructive mb-3">{error}</p>
+                    )}
+
                     {/* Login Button */}
                     <Button
                         type="submit"
                         onClick={handleSubmit}
-                        disabled={isLoading}
+                        disabled={isLoading || !username || !password}
                     >
-                        Login
+                        {isLoading ? 'Loading...' : 'Login'}
                     </Button>
 
 

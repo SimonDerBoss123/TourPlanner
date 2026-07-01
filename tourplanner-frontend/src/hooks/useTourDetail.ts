@@ -71,6 +71,7 @@ export function useTourDetail(tourId:string) {
     const deleteTourLog = async (logId: number) => {
         await tourLogService.delete(logId, Number(tourId))
         fetchTourLogs()
+        fetchTour()
     }
 
 

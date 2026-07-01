@@ -41,6 +41,12 @@ export default function NewTourLogModal({isOpen,onClose,onSuccess,tourId}: NewTo
         console.log('response ok:', response.ok)
         console.log('status:', response.status)
         if(response.ok){
+            setComment('');
+            setDifficulty('');
+            setRating('');
+            setTotalTime('');
+            setDateTime('');
+            setTotalDistance('');
             onClose();
             onSuccess();
         }

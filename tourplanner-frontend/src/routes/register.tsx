@@ -35,7 +35,7 @@ function RegisterComponent() {
             // Navigate to the redirect URL using router navigation
             navigate({ to: redirect })
         } catch (err) {
-            setError('Invalid username or password')
+            setError('Registration failed. Please try again.')
         } finally {
             setIsLoading(false)
         }
@@ -60,14 +60,19 @@ function RegisterComponent() {
                            placeholder="Passwort"
                     />
 
+                    {error && (
+                        <p className="text-xs text-destructive mb-3">{error}</p>
+                    )}
+
                     {/* Register Button */}
                     <Button
                         type="submit"
                         onClick={handleSubmit}
-                        disabled={isLoading}
+                        disabled={isLoading || !username || !password}
                     >
-                        Registrieren
+                        {isLoading ? 'Loading...' : 'Registrieren'}
                     </Button>
+
 
 
                 </CardContent>

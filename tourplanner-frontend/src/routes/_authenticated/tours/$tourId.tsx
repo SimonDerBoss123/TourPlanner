@@ -49,12 +49,18 @@ function TourDetailPage() {
             tourId={tourId}
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
-            onSuccess={fetchTourLogs}
+            onSuccess={() => {
+                fetchTourLogs();
+                fetchTour();
+            }}
         />
         <EditTourModal
             isOpen={isEditOpen}
             onClose={() => setIsEditOpen(false)}
-            onSuccess={fetchTour}
+            onSuccess={() => {
+              fetchTourLogs();
+              fetchTour();
+            }}
             tour={tour}
             tourId={tourId}
         />
@@ -62,7 +68,10 @@ function TourDetailPage() {
             <EditTourLogModal
                 isOpen={isLogEditOpen}
                 onClose={() => setIsLogEditOpen(false)}
-                onSuccess={fetchTourLogs}
+                onSuccess={() => {
+                  fetchTourLogs();
+                  fetchTour();
+                }}
                 logId={selectedLog?.id}
                 tourId={Number(tourId)}
                 tourLog={selectedLog}
