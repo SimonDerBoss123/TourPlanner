@@ -70,7 +70,7 @@ export default function NewTourModal({isOpen,onClose,onSuccess} : NewTourModalPr
                     <select
                         value={transportType}
                         onChange={e => setTransportType(e.target.value)}
-                        className="border rounded-lg px-3 py-2 text-sm w-full bg-background"
+                        className="border rounded-lg px-1 py-2 w-full bg-background"
                     >
                         <option value="">Select transport type</option>
                         <option value="driving-car">Car</option>
