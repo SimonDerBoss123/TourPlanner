@@ -18,7 +18,7 @@ export interface TourCardProps {
 
 export default function TourCard({ tour }: TourCardProps) {
     return (
-        <Link to="/tours/$tourId" params={{tourId: String(tour.id)}}>
+        <Link to="/tours/$tourId" params={{tourId: String(tour.id)}} className=" block mb-4">
         <Card className="border-0 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
             <CardContent className="py-4 px-5">
                 <div className="flex items-center justify-between">

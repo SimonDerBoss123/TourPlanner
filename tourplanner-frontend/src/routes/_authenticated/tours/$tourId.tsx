@@ -124,7 +124,7 @@ function TourDetailPage() {
             </div>
             <div className="rounded-xl border bg-muted/20 px-4 py-3">
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Child Friendly</p>
-              <p className="text-sm font-medium">{tour.childFriendliness ? '✓ Yes' : '✗ No'}</p>
+              <p className="text-sm font-medium">{tour.childFriendliness ? 'Yes' : 'No'}</p>
             </div>
           </div>
 
