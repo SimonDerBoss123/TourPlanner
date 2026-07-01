@@ -1,6 +1,8 @@
 package com.example.tourplannerbackend.controller;
 
 import com.example.tourplannerbackend.domain.Tour;
+import com.example.tourplannerbackend.dto.TourDto;
+import com.example.tourplannerbackend.mapper.TourMapper;
 import com.example.tourplannerbackend.security.JwtUtil;
 import com.example.tourplannerbackend.service.TourService;
 import org.springframework.web.bind.annotation.*;
@@ -13,18 +15,19 @@ public class TourController {
 
     private final TourService tourService;
     private final JwtUtil jwtUtil;
+    private final TourMapper tourMapper;
 
-    public TourController(TourService tourService, JwtUtil jwtUtil) {
+    public TourController(TourService tourService, JwtUtil jwtUtil, TourMapper tourMapper) {
         this.tourService = tourService;
         this.jwtUtil = jwtUtil;
+        this.tourMapper = tourMapper;
     }
 
     @GetMapping
-    public List<Tour> getAllTours(@RequestHeader ("Authorization") String authHeader) {
+    public List<TourDto> getAllTours(@RequestHeader ("Authorization") String authHeader) {
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);
-        return tourService.getAllTours(username);
-
+        return tourService.getAllTours(username).stream().map(tourMapper::toDto).toList();
     }
 
     @PostMapping
