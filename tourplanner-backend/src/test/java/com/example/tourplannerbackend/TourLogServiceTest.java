@@ -107,8 +107,13 @@ public class TourLogServiceTest {
 
     @Test
     void updateTourLog_setsIdAndSaves() {
+        TourLog existing = new TourLog();
+        existing.setId(1L);
+
         TourLog tourLog = new TourLog();
         tourLog.setComment("Updated");
+
+        when(tourLogRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(tourLogRepository.save(any(TourLog.class))).thenReturn(tourLog);
 
         TourLog result = tourLogService.updateTourLog(1L, tourLog);

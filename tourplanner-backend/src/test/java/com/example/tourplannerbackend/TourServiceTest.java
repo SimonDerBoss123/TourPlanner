@@ -2,9 +2,11 @@ package com.example.tourplannerbackend;
 
 import com.example.tourplannerbackend.domain.Tour;
 import com.example.tourplannerbackend.domain.User;
+import com.example.tourplannerbackend.dto.RouteInfo;
 import com.example.tourplannerbackend.repository.TourRepository;
 import com.example.tourplannerbackend.repository.UserRepository;
 import com.example.tourplannerbackend.security.JwtUtil;
+import com.example.tourplannerbackend.service.OpenRouteService;
 import com.example.tourplannerbackend.service.TourService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +32,8 @@ public class TourServiceTest {
     @Mock
     private JwtUtil jwtUtil;
 
+    @Mock
+    private OpenRouteService openRouteService;
     @InjectMocks
     private TourService tourService;
 
@@ -62,7 +66,10 @@ public class TourServiceTest {
         Tour tour = new Tour();
         tour.setName("Wienerwald");
 
+        RouteInfo routeInfo = new RouteInfo(10.0, 60.0, "geometry");
+
         when(userRepository.findByUsername("simon")).thenReturn(Optional.of(user));
+        when(openRouteService.getRouteInfo(any(), any(), any())).thenReturn(routeInfo);
         when(tourRepository.save(tour)).thenReturn(tour);
 
         Tour result = tourService.createTour(tour, "simon");
@@ -105,8 +112,16 @@ public class TourServiceTest {
 
     @Test
     void updateTour_setsIdAndSaves() {
+        Tour existing = new Tour();
+        existing.setId(1L);
+
         Tour tour = new Tour();
         tour.setName("Neu");
+
+        RouteInfo routeInfo = new RouteInfo(10.0, 60.0, "geometry");
+
+        when(tourRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(openRouteService.getRouteInfo(any(), any(), any())).thenReturn(routeInfo);
         when(tourRepository.save(any(Tour.class))).thenReturn(tour);
 
         Tour result = tourService.updateTour(1L, tour);
