@@ -29,4 +29,9 @@ public class Tour {
     private List<TourLog> tourLogs;
     @ManyToOne
     private User user;
+
+    public int getPopularity() {
+        if (tourLogs == null) return 0;
+        return tourLogs.size();
+    }
 }
