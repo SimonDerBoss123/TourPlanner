@@ -1,7 +1,9 @@
 package com.example.tourplannerbackend.service;
+import com.example.tourplannerbackend.domain.TourLog;
 import com.example.tourplannerbackend.domain.User;
 import com.example.tourplannerbackend.domain.Tour;
 import com.example.tourplannerbackend.dto.RouteInfo;
+import com.example.tourplannerbackend.repository.TourLogRepository;
 import com.example.tourplannerbackend.repository.TourRepository;
 import com.example.tourplannerbackend.repository.UserRepository;
 import com.example.tourplannerbackend.security.JwtUtil;
@@ -18,18 +20,21 @@ public class TourService {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final OpenRouteService openRouteService;
+    private final TourLogRepository tourLogRepository;
 
-
-    public TourService(TourRepository tourRepository, JwtUtil jwtUtil, UserRepository userRepository, OpenRouteService openRouteService) {
+    public TourService(TourRepository tourRepository, JwtUtil jwtUtil, UserRepository userRepository, OpenRouteService openRouteService, TourLogRepository tourLogRepository) {
         this.tourRepository = tourRepository;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.openRouteService = openRouteService;
+        this.tourLogRepository = tourLogRepository;
     }
 
     public List<Tour> getAllTours(String username) {
         logger.info("Getting all tours for user '{}'", username);
-        return tourRepository.findByUserUsername(username);
+        List<Tour> tours = tourRepository.findByUserUsername(username);
+        tours.forEach(tour -> tour.setPopularity(tourLogRepository.countByTourId(tour.getId())));
+        return tours;
     }
 
     public Tour createTour(Tour tour, String username) {
@@ -37,7 +42,7 @@ public class TourService {
                 .orElseThrow(() -> new RuntimeException("User nicht gefunden"));
         tour.setUser(user);
 
-        RouteInfo routeInfo= openRouteService.getRouteInfo(tour.getFromLocation(), tour.getToLocation(), tour.getTransportType());
+        RouteInfo routeInfo = openRouteService.getRouteInfo(tour.getFromLocation(), tour.getToLocation(), tour.getTransportType());
         tour.setTourDistance(routeInfo.getDistance());
         tour.setEstimatedTime(routeInfo.getDuration());
         tour.setGeometry(routeInfo.getGeometry());
@@ -62,13 +67,23 @@ public class TourService {
         tour.setEstimatedTime(routeInfo.getDuration());
         tour.setGeometry(routeInfo.getGeometry());
 
-
         logger.info("Tour updated: {}", id);
         return tourRepository.save(tour);
     }
 
-    public Tour getTourById(Long id){
-        return tourRepository.findById(id).orElseThrow();
-    }
+    public Tour getTourById(Long id) {
+        Tour tour = tourRepository.findById(id).orElseThrow();
+        int logCount = tourLogRepository.countByTourId(id);
+        tour.setPopularity(logCount);
 
+        //child friendliness ausrechnen
+        List<TourLog> logs = tourLogRepository.findByTourId(id);
+        boolean childFriendly = !logs.isEmpty()
+                && logs.stream().mapToInt(TourLog::getDifficulty).average().orElse(5) <= 2
+                && tour.getTourDistance() != null && tour.getTourDistance() <= 10
+                && tour.getEstimatedTime() != null && tour.getEstimatedTime() <= 60;
+        tour.setChildFriendliness(childFriendly);
+
+        return tour;
+    }
 }
