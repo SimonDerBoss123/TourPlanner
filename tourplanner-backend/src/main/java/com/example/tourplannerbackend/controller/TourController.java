@@ -39,13 +39,17 @@ public class TourController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTour(@PathVariable Long id){
-        tourService.deleteTour(id);
+    public void deleteTour(@PathVariable Long id, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+        tourService.deleteTour(id, username);
     }
 
     @PutMapping("/{id}")
-    public Tour updateTour(@PathVariable Long id, @RequestBody Tour tour){
-        return tourService.updateTour(id,tour);
+    public Tour updateTour(@PathVariable Long id, @RequestBody Tour tour, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+        return tourService.updateTour(id,tour, username);
     }
 
     @GetMapping("/{id}")

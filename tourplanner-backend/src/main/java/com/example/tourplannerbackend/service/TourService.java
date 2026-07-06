@@ -52,13 +52,21 @@ public class TourService {
         return savedTour;
     }
 
-    public void deleteTour(Long id){
+    public void deleteTour(Long id, String username){
+        Tour tour = tourRepository.findById(id).orElseThrow();
+        if (!tour.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
         tourRepository.deleteById(id);
-        logger.info("Tour deleted: {}", id);
+        logger.info("Tour deleted: {} by: {}", id, username);
     }
 
-    public Tour updateTour(Long id, Tour tour){
+    public Tour updateTour(Long id, Tour tour, String username){
         Tour existing = tourRepository.findById(id).orElseThrow();
+        if (!existing.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized");
+        }
         tour.setId(id);
         tour.setUser(existing.getUser());
 
@@ -67,7 +75,7 @@ public class TourService {
         tour.setEstimatedTime(routeInfo.getDuration());
         tour.setGeometry(routeInfo.getGeometry());
 
-        logger.info("Tour updated: {}", id);
+        logger.info("Tour updated: {} by: {}", id, username);
         return tourRepository.save(tour);
     }
 
