@@ -45,11 +45,11 @@ export default function TourCard({ tour }: TourCardProps) {
                         <div className="text-right hidden sm:block">
                             <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
                                 <RouteIcon className="w-3 h-3" />
-                                <span>{tour.tourDistance} km</span>
+                                <span>{tour.tourDistance ? tour.tourDistance.toFixed(1) : '—'} km</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end mt-0.5">
                                 <Clock className="w-3 h-3" />
-                                <span>{tour.estimatedTime} min</span>
+                                <span>{tour.estimatedTime ? tour.estimatedTime.toFixed(0) : '—'} min</span>
                             </div>
                         </div>
                         <Badge variant="outline" className="text-xs">

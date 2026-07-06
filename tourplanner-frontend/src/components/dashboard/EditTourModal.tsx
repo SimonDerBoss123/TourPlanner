@@ -25,6 +25,8 @@ export default function EditTourModal({isOpen,onClose,onSuccess, tourId, tour} :
     const [fromLocation, setFromLocation] = useState(tour.fromLocation)
     const [to, setTo] = useState(tour.toLocation)
     const [transportType,setTransportType] = useState(tour.transportType)
+    const [fromSuggestions, setFromSuggestions] = useState([])
+    const [toSuggestions, setToSuggestions] = useState([])
 
 
     const handleSubmit = async() => {
@@ -35,6 +37,34 @@ export default function EditTourModal({isOpen,onClose,onSuccess, tourId, tour} :
             onClose()
             onSuccess()
         }
+    }
+
+    const searchFromLocation = async (query: string) => {
+
+        //wenn weniger als 2 zeichen eingetippt aufhören - wenn mehr dann api call machen
+        if (query.length < 2) {
+            setFromSuggestions([]);
+            return;
+        }
+        const response = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${import.meta.env.VITE_ORS_API_KEY}&text=${query}&size=5`);
+        //gibt listen von orten zurück
+        const data = await response.json();
+
+        //von jedem ort das label rausziehen und im state speichern
+        const labels = data.features.map((feature: any) => feature.properties.label);
+        setFromSuggestions(labels);
+    }
+
+    const searchToLocation = async (query: string) => {
+        if (query.length < 2) {
+            setToSuggestions([]);
+            return;
+        }
+        const response = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${import.meta.env.VITE_ORS_API_KEY}&text=${query}&size=5`);
+        const data = await response.json();
+
+        const labels = data.features.map((feature: any) => feature.properties.label);
+        setToSuggestions(labels);
     }
 
     return (
@@ -55,16 +85,56 @@ export default function EditTourModal({isOpen,onClose,onSuccess, tourId, tour} :
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                     />
-                    <Input
-                        placeholder="From"
-                        value={fromLocation}
-                        onChange={e => setFromLocation(e.target.value)}
-                    />
-                    <Input
-                        placeholder="to"
-                        value={to}
-                        onChange={e => setTo(e.target.value)}
-                    />
+                    <div className="relative">
+                        <Input
+                            placeholder="From"
+                            value={fromLocation}
+                            onChange={e => {
+                                setFromLocation(e.target.value);
+                                searchFromLocation(e.target.value);
+                            }}
+                        />
+                        {fromSuggestions.length > 0 && (
+                            <div className="absolute z-50 w-full mt-1 bg-background border rounded-xl shadow-lg overflow-hidden">
+                                {fromSuggestions.map((suggestion, i) => (
+                                    <div
+                                        key={i}
+                                        className="px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                        onClick={() => {
+                                            setFromLocation(suggestion);
+                                            setFromSuggestions([]);
+                                        }}>
+                                        {suggestion}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div className="relative">
+                        <Input
+                            placeholder="To"
+                            value={to}
+                            onChange={e => {
+                                setTo(e.target.value);
+                                searchToLocation(e.target.value);
+                            }}
+                        />
+                        {toSuggestions.length > 0 && (
+                            <div className="absolute z-50 w-full mt-1 bg-background border rounded-xl shadow-lg overflow-hidden">
+                                {toSuggestions.map((suggestion, i) => (
+                                    <div
+                                        key={i}
+                                        className="px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                        onClick={() => {
+                                            setTo(suggestion);
+                                            setToSuggestions([]);
+                                        }}>
+                                        {suggestion}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                     <select
                         value={transportType}
                         onChange={e => setTransportType(e.target.value)}
