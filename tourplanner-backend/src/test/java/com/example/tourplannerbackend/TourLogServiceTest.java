@@ -34,6 +34,9 @@ public class TourLogServiceTest {
         Tour tour = new Tour();
         tour.setId(1L);
         tour.setName("Wienerwald");
+        com.example.tourplannerbackend.domain.User user = new com.example.tourplannerbackend.domain.User();
+        user.setUsername("simon");
+        tour.setUser(user);
 
         TourLog tourLog = new TourLog();
         tourLog.setComment("Super!");
@@ -41,7 +44,7 @@ public class TourLogServiceTest {
         when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
         when(tourLogRepository.save(tourLog)).thenReturn(tourLog);
 
-        TourLog result = tourLogService.createTourLog(1L, tourLog);
+        TourLog result = tourLogService.createTourLog(1L, tourLog, "simon");
 
         assertEquals("Wienerwald", result.getTour().getName());
         verify(tourLogRepository, times(1)).save(tourLog);
@@ -51,12 +54,20 @@ public class TourLogServiceTest {
     void createTourLog_throwsExceptionWhenTourNotFound() {
         when(tourRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> tourLogService.createTourLog(99L, new TourLog()));
+        assertThrows(RuntimeException.class, () -> tourLogService.createTourLog(99L, new TourLog(),"simon"));
     }
 
     @Test
     void deleteTourLog_callsDeleteById() {
-        tourLogService.deleteTourLog(1L);
+        Tour tour = new Tour();
+        tour.setId(1L);
+        com.example.tourplannerbackend.domain.User user = new com.example.tourplannerbackend.domain.User();
+        user.setUsername("simon");
+        tour.setUser(user);
+
+        when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
+
+        tourLogService.deleteTourLog(1L, 1L, "simon");
         verify(tourLogRepository, times(1)).deleteById(1L);
     }
 
@@ -107,8 +118,14 @@ public class TourLogServiceTest {
 
     @Test
     void updateTourLog_setsIdAndSaves() {
+        Tour tour = new Tour();
+        com.example.tourplannerbackend.domain.User user = new com.example.tourplannerbackend.domain.User();
+        user.setUsername("simon");
+        tour.setUser(user);
+
         TourLog existing = new TourLog();
         existing.setId(1L);
+        existing.setTour(tour);
 
         TourLog tourLog = new TourLog();
         tourLog.setComment("Updated");
@@ -116,7 +133,7 @@ public class TourLogServiceTest {
         when(tourLogRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(tourLogRepository.save(any(TourLog.class))).thenReturn(tourLog);
 
-        TourLog result = tourLogService.updateTourLog(1L, tourLog);
+        TourLog result = tourLogService.updateTourLog(1L, tourLog, "simon");
 
         assertEquals(1L, result.getId());
         verify(tourLogRepository, times(1)).save(tourLog);
