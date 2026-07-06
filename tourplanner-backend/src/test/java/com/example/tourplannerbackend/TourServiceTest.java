@@ -104,13 +104,17 @@ public class TourServiceTest {
 
     @Test
     void getTourById_returnsTour() {
+        User user = new User();
+        user.setUsername("simon");
+
         Tour tour = new Tour();
         tour.setId(1L);
         tour.setName("Wienerwald");
+        tour.setUser(user);
 
         when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
 
-        Tour result = tourService.getTourById(1L);
+        Tour result = tourService.getTourById(1L, "simon");
 
         assertEquals("Wienerwald", result.getName());
     }
@@ -118,7 +122,7 @@ public class TourServiceTest {
     @Test
     void getTourById_throwsExceptionWhenNotFound() {
         when(tourRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(Exception.class, () -> tourService.getTourById(99L));
+        assertThrows(Exception.class, () -> tourService.getTourById(99L, "simon"));
     }
 
     @Test

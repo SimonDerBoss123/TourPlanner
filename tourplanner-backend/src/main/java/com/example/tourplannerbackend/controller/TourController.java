@@ -53,7 +53,9 @@ public class TourController {
     }
 
     @GetMapping("/{id}")
-    public Tour getTourById(@PathVariable Long id){
-        return tourService.getTourById(id);
+    public Tour getTourById(@PathVariable Long id, @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
+        return tourService.getTourById(id, username);
     }
 }

@@ -79,8 +79,13 @@ public class TourService {
         return tourRepository.save(tour);
     }
 
-    public Tour getTourById(Long id) {
+    public Tour getTourById(Long id, String username) {
         Tour tour = tourRepository.findById(id).orElseThrow();
+
+        if (!tour.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
         int logCount = tourLogRepository.countByTourId(id);
         tour.setPopularity(logCount);
 
