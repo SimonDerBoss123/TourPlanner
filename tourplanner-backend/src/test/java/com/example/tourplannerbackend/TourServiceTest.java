@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import com.example.tourplannerbackend.repository.TourLogRepository;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +22,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TourServiceTest {
+
+    @Mock
+    private TourLogRepository tourLogRepository;
 
     @Mock
     private TourRepository tourRepository;
@@ -87,7 +90,15 @@ public class TourServiceTest {
 
     @Test
     void deleteTour_callsDeleteById() {
-        tourService.deleteTour(1L);
+        Tour tour = new Tour();
+        tour.setId(1L);
+        User user = new User();
+        user.setUsername("simon");
+        tour.setUser(user);
+
+        when(tourRepository.findById(1L)).thenReturn(Optional.of(tour));
+
+        tourService.deleteTour(1L, "simon");
         verify(tourRepository, times(1)).deleteById(1L);
     }
 
@@ -114,6 +125,9 @@ public class TourServiceTest {
     void updateTour_setsIdAndSaves() {
         Tour existing = new Tour();
         existing.setId(1L);
+        User user = new User();
+        user.setUsername("simon");
+        existing.setUser(user);
 
         Tour tour = new Tour();
         tour.setName("Neu");
@@ -124,7 +138,7 @@ public class TourServiceTest {
         when(openRouteService.getRouteInfo(any(), any(), any())).thenReturn(routeInfo);
         when(tourRepository.save(any(Tour.class))).thenReturn(tour);
 
-        Tour result = tourService.updateTour(1L, tour);
+        Tour result = tourService.updateTour(1L, tour, "simon");
 
         assertEquals(1L, result.getId());
         verify(tourRepository, times(1)).save(tour);
